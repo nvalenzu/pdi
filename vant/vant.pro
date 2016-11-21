@@ -11,6 +11,10 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = vant
 TEMPLATE = app
 
+LIBS += `pkg-config \
+    opencv \
+    --cflags \
+    --libs`
 
 SOURCES += main.cpp\
         mainwindow.cpp
