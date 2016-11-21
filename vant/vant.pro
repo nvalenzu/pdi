@@ -19,6 +19,7 @@ LIBS += `pkg-config \
 SOURCES += main.cpp\
         mainwindow.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += mainwindow.h \
+    rgb_hist.h
 
 FORMS    += mainwindow.ui

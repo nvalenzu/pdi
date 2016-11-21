@@ -125,7 +125,8 @@ DIST          = /usr/lib64/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib64/qt5/mkspecs/features/exceptions.prf \
 		/usr/lib64/qt5/mkspecs/features/yacc.prf \
 		/usr/lib64/qt5/mkspecs/features/lex.prf \
-		../vant/vant.pro ../vant/mainwindow.h ../vant/main.cpp \
+		../vant/vant.pro ../vant/mainwindow.h \
+		../vant/rgb_hist.h ../vant/main.cpp \
 		../vant/mainwindow.cpp
 QMAKE_TARGET  = vant
 DESTDIR       = 
@@ -306,7 +307,7 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib64/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents ../vant/mainwindow.h $(DISTDIR)/
+	$(COPY_FILE) --parents ../vant/mainwindow.h ../vant/rgb_hist.h $(DISTDIR)/
 	$(COPY_FILE) --parents ../vant/main.cpp ../vant/mainwindow.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents ../vant/mainwindow.ui $(DISTDIR)/
 
@@ -364,7 +365,7 @@ compiler_clean: compiler_moc_predefs_clean compiler_moc_header_clean compiler_ui
 
 ####### Compile
 
-main.o: ../vant/main.cpp 
+main.o: ../vant/main.cpp ../vant/rgb_hist.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../vant/main.cpp
 
 mainwindow.o: ../vant/mainwindow.cpp ../vant/mainwindow.h \
