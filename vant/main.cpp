@@ -96,14 +96,6 @@ int main(int argc, char *argv[])
     //4. Obtain filter responses
     fbank.calculateFilterResponses();
 
-    std::cout << "Numero de muestras analizadas: " << fbank.filter_responses.size() << std::endl;
-    for(unsigned j = 0; j < fbank.filter_responses.size(); j++) {
-        std::vector<float> asd = fbank.filter_responses[j];
-        for (unsigned i = 0; i < asd.size(); i++)
-            std::cout << asd.at(i) << " ";
-        std::cout << std::endl;
-    }
-
     /*
     // Cargar imagen
     if (argc == 1) {
@@ -126,7 +118,25 @@ int main(int argc, char *argv[])
 
     //5. Aplicar K-means
     cv::Mat bestLabels, centers;
-    cv::kmeans(fbank.filter_responses, 6, bestLabels, TermCriteria( CV_TERMCRIT_EPS+CV_TERMCRIT_ITER, 10, 1.0), 3, KMEANS_PP_CENTERS, centers);
+    cv::Mat Kpoints(fbank.filter_responses.size(), 8, CV_32F);
+    std::cout << "Numero de muestras analizadas: " << fbank.filter_responses.size() << std::endl;
+
+    for(unsigned j = 0; j < fbank.filter_responses.size(); j++) {
+        std::vector<float> asd = fbank.filter_responses[j];
+        for (unsigned i = 0; i < asd.size(); i++) {
+            Kpoints.at<float>(j, i) = asd.at(i);
+            std::cout << asd.at(i) << " ";
+        }
+        std::cout << std::endl;
+    }
+    cv::kmeans(Kpoints, 6, bestLabels, TermCriteria( CV_TERMCRIT_EPS+CV_TERMCRIT_ITER, 10, 1.0), 3, KMEANS_PP_CENTERS, centers);
+
+    std::cout << "Kpoints: " << std::endl;
+    std::cout << Kpoints << std::endl;
+    std::cout << "CENTROS: " << std::endl;
+    std::cout << centers << std::endl;
+    std::cout << "BestLabels: " << std::endl;
+    std::cout << bestLabels << std::endl;
 
 
 
