@@ -17,9 +17,11 @@ LIBS += `pkg-config \
     --libs`
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+    filterbank.cpp
 
 HEADERS  += mainwindow.h \
-    rgb_hist.h
+    rgb_hist.h \
+    filterbank.h
 
 FORMS    += mainwindow.ui
