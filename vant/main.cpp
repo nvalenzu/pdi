@@ -117,7 +117,7 @@ int main(int argc, char *argv[])
     */
 
     //5. Aplicar K-means
-    cv::Mat bestLabels, centers;
+    cv::Mat bestLabels, TextonDictionary;
     cv::Mat Kpoints(fbank.filter_responses.size(), 8, CV_32F);
     std::cout << "Numero de muestras analizadas: " << fbank.filter_responses.size() << std::endl;
 
@@ -129,16 +129,45 @@ int main(int argc, char *argv[])
         }
         std::cout << std::endl;
     }
-    cv::kmeans(Kpoints, 6, bestLabels, TermCriteria( CV_TERMCRIT_EPS+CV_TERMCRIT_ITER, 10, 1.0), 3, KMEANS_PP_CENTERS, centers);
+    cv::kmeans(Kpoints, 10, bestLabels, TermCriteria( CV_TERMCRIT_EPS+CV_TERMCRIT_ITER, 10, 1.0), 3, KMEANS_PP_CENTERS, TextonDictionary);
 
     std::cout << "Kpoints: " << std::endl;
     std::cout << Kpoints << std::endl;
-    std::cout << "CENTROS: " << std::endl;
-    std::cout << centers << std::endl;
+    std::cout << "TextonDictionary: " << std::endl;
+    std::cout << TextonDictionary << std::endl;
     std::cout << "BestLabels: " << std::endl;
     std::cout << bestLabels << std::endl;
 
 
+    //6. Generar modelo
+    cv::Mat imageTrain = cv::imread("/home/negro/Documentos/PDI/pdi/vant/3.jpg", 1);
+    if(imageTrain.empty()) {
+        std::cerr << "Error reading image " << "/home/negro/Documentos/PDI/pdi/vant/3.jpg" << std::endl;
+        return 1;
+    }
+
+    cv::Rect r;
+    r.width = bankSize; r.height = bankSize;
+    r.x = imageTrain.cols/2 - bankSize/2; r.y = imageTrain.rows/2 - bankSize/2;
+    cv::Mat roi(imageTrain, r);
+
+    cv::imshow("Imagen de entrenamiento", roi);
+
+//    int hist[10];
+//    std::fill_n(hist, 10, 0);
+
+//    //cout << "sdjkhjaks: " << roi.cols*roirows << endl;
+
+//    for (int i = 0; i < bestLabels.rows; i++) {
+//        hist[bestLabels.at<int>(i)]++;
+//    }
+
+//    for (int i = 0; i < 10; i++)
+//        cout << "hay " << hist[i] <<  " " << i << "s" << endl;
+
+
+
+    waitKey(0);
 
 
     return 0;
