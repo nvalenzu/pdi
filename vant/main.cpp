@@ -19,7 +19,7 @@ void getPointsFromImage(std::deque<cv::Point2i> &points, cv::Mat &ImageToPoints,
             points.push_back(p);
         }
     }
-
+    // Solo punto del medio de la imagen
     //cv::Point2i p(ImageToPoints.cols/2, ImageToPoints.rows/2);
     //points.push_back(p);
 }
@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
     // Crear un banco de filtros para cada textura
     std::vector<FilterBank> fbank;
 
-    for (unsigned n = 0; n < dirList.size()-2; n++) {
+    for (int n = 0; n < dirList.size()-2; n++) {
         //1. Create Filter Bank
         fbank.emplace_back(bankSize);
 
@@ -81,9 +81,9 @@ int main(int argc, char *argv[])
                 // con tamaño igual al filtro
                 getPointsFromImage(imagePoints, image, bankSize);
                 fbank[n].prepareSamplesFromPoints(image, imagePoints);
-                QString s = "Imagen " + QString::number(i);
-                cv::imshow(s.toStdString(), image);
-                cv::waitKey();
+                // Mostrar imagenes
+                //QString s = "Imagen " + QString::number(n) + QString::number(i);
+                //cv::imshow(s.toStdString(), image);
             }
             // Agrega nombre al banco
             QString nombre = QString::fromStdString(name);
@@ -91,14 +91,15 @@ int main(int argc, char *argv[])
             fbank[n].name = nombre.toStdString();
         }
 
-//        //Show samples
-//        for(unsigned i = 0; i < fbank[n].samples.size(); i++) {
+
+        //Show samples
+//        for(unsigned i = 0; i < fbank[n].samples.size(); i+) {
 //            QString s = "Bank: Sample " + QString::number(i);
 //            cv::Mat r;
 //            cv::resize(fbank[n].samples[i],r, cv::Size(2*bankSize, 2*bankSize));
 //            cv::imshow(s.toStdString(), r);
+//            cv::waitKey(0);
 //        }
-//        cv::waitKey(0);
 
         //4. Obtain filter responses
         fbank[n].calculateFilterResponses();
@@ -157,7 +158,7 @@ int main(int argc, char *argv[])
         float min = 9999;
         float dist;
         int c = 0;
-        for (unsigned j = 0; j < fbank[i].TextonDictionary.rows; j++) {
+        for (int j = 0; j < fbank[i].TextonDictionary.rows; j++) {
             dist = cv::norm(fbank[i].TextonDictionary.row(j), Tresponse);
             if (dist < min) {
                 min = dist;
@@ -209,6 +210,6 @@ int main(int argc, char *argv[])
         cout << imagePoints[i] <<  " ";
     }
     */
-
+    cv::waitKey(0);
     return 0;
 }
