@@ -369,3 +369,17 @@ cv::Mat FilterBank::filterToShow(cv::Mat &filter) {
     return toShow;
 }
 
+void FilterBank::applyKmeans(int size) {
+    cv::Mat M(size, 8, CV_32F);
+    Kpoints = M.clone();
+
+    // Transformar respuestas de tipo std::vector<std::vector>> a cv::Mat Kpoints
+    for(unsigned j = 0; j < filter_responses.size(); j++) {
+        std::vector<float> temp = filter_responses[j];
+        for (unsigned i = 0; i < temp.size(); i++) {
+            Kpoints.at<float>(j, i) = temp.at(i);
+        }
+    }
+    // Generar 10 clusters por textura
+    cv::kmeans(Kpoints, 10, bestLabels, cv::TermCriteria( CV_TERMCRIT_EPS+CV_TERMCRIT_ITER, 10, 1.0), 3, cv::KMEANS_PP_CENTERS, TextonDictionary);
+}

@@ -6,13 +6,20 @@
 class FilterBank
 {
     public:
-        int size;
         FilterBank(int size);
+
+        int size;
+        std::string name;
         std::vector<cv::Mat> filters;
         std::vector<cv::Mat> norm_filters;
         std::vector<cv::Mat> samples;
         std::vector<cv::Mat> norm_samples;
         std::vector<std::vector<float>> filter_responses;
+
+        // Para K-Means
+        cv::Mat bestLabels;
+        cv::Mat TextonDictionary;
+        cv::Mat Kpoints;
 
         void reorient(cv::Mat &points, float angle, cv::Mat &reoriented_points);
         float gauss(float sigma, float mean, float value, int ord);
@@ -25,6 +32,7 @@ class FilterBank
         void normalizeFilters();
         void calculateFilterResponses();
         void normalizeResponse(std::vector<float>& response);
+        void applyKmeans(int size);
 
         static float applyFilter(cv::Mat &sample, cv::Mat &filter, int size);
         static void normalizeFilter(cv::Mat &filter, cv::Mat &norm_filter, int size);
