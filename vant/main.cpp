@@ -13,13 +13,14 @@ using namespace cv;
 
 void getPointsFromImage(std::deque<cv::Point2i> &points, cv::Mat &ImageToPoints, int filterSize) {
     points.clear();
+    // Consigue todas las muestras posibles de las imagenes capturadas
     for (int i = 0; i < (int)(ImageToPoints.cols/filterSize); i++) {
         for (int j = 0; j < (int)(ImageToPoints.rows/filterSize); j++) {
             cv::Point2i p((filterSize-1)/2 + i*filterSize, (filterSize-1)/2 + j*filterSize);
             points.push_back(p);
         }
     }
-    // Solo punto del medio de la imagen
+    // Toma muestra solo con punto central (si se usa, comentar anterior)
     //cv::Point2i p(ImageToPoints.cols/2, ImageToPoints.rows/2);
     //points.push_back(p);
 }
@@ -31,6 +32,7 @@ int main(int argc, char *argv[])
     QDir dir;
     int bankSize = 49;
 
+    // Carga el directorio inicial
     if (argc == 1) {
          std::cerr << "Error: please add directory path" << std::endl;
          return -1;
@@ -52,6 +54,7 @@ int main(int argc, char *argv[])
     // Crear un banco de filtros para cada textura
     std::vector<FilterBank> fbank;
 
+    // Crea una clase contenedora para cada tipo de muestra
     for (int n = 0; n < dirList.size()-2; n++) {
         //1. Create Filter Bank
         fbank.emplace_back(bankSize);
@@ -92,14 +95,14 @@ int main(int argc, char *argv[])
         }
 
 
-        //Show samples
-//        for(unsigned i = 0; i < fbank[n].samples.size(); i+) {
+//        //Show samples
+//        for(unsigned i = 0; i < fbank[n].samples.size(); i++) {
 //            QString s = "Bank: Sample " + QString::number(i);
 //            cv::Mat r;
 //            cv::resize(fbank[n].samples[i],r, cv::Size(2*bankSize, 2*bankSize));
 //            cv::imshow(s.toStdString(), r);
-//            cv::waitKey(0);
 //        }
+        cv::waitKey(0);
 
         //4. Obtain filter responses
         fbank[n].calculateFilterResponses();
@@ -108,8 +111,8 @@ int main(int argc, char *argv[])
         fbank[n].applyKmeans(fbank[n].filter_responses.size());
 
         //std::cout << "Numero de muestras analizadas: " << fbank[n].filter_responses.size() << std::endl;
-        //std::cout << "Kpoints: " << std::endl;
-        //std::cout << fbank[n].Kpoints << std::endl;
+        std::cout << "Kpoints: " << std::endl;
+        std::cout << fbank[n].Kpoints << std::endl;
         std::cout << "TextonDictionary: " << std::endl;
         std::cout << fbank[n].TextonDictionary << std::endl;
         //std::cout << "BestLabels: " << std::endl;
@@ -135,26 +138,25 @@ int main(int argc, char *argv[])
     // Preparar muestra de tamaño igual al filtro
     trainingBank.prepareSamplesFromPoints(trainingImage, trainingPoints);
     // Mostrar imagen de entrenamiento
-    cv::Mat r;
-    cv::resize(trainingBank.samples[0],r, cv::Size(2*bankSize, 2*bankSize));
-    cv::imshow("Imagen entrenamiento", r);
+    //cv::Mat r;
+    //cv::resize(trainingBank.samples[0],r, cv::Size(2*bankSize, 2*bankSize));
+    //cv::imshow("Imagen entrenamiento", r);
     // Calcular respuesta a filtros de imagen de entrenamiento
     trainingBank.calculateFilterResponses();
 
     // Transformar respuesta de tipo "vector" a "Mat"
-    std::vector<float> trainResponse = trainingBank.filter_responses[0];
-    cv::Mat Tresponse(1, trainResponse.size(), CV_32F);
-    for (unsigned i = 0; i < trainResponse.size(); i++)
-        Tresponse.at<float>(0, i) = trainResponse.at(i);
+    std::vector<float> temp = trainingBank.filter_responses[0];
+    cv::Mat Tresponse(1, temp.size(), CV_32F);
+    for (unsigned i = 0; i < temp.size(); i++)
+        Tresponse.at<float>(0, i) = temp.at(i);
 
     // Mostrar respuesta a filtros imagen de entrenamiento
     std::cout << "Respuesta imagen entrenamiento: " << std::endl;
     std::cout <<  Tresponse << std::endl;
     std::cout << std::endl;
 
-    // Buscar distancia minima entre img de entrenamiento y diccionario
+    // Buscar distancia minima entre img de entrenamiento y diccionario de textones
     for (unsigned i = 0; i < fbank.size(); i++){
-        cv::Mat distancias(fbank[i].TextonDictionary.rows, 1, CV_32F);
         float min = 9999;
         float dist;
         int c = 0;
@@ -169,47 +171,39 @@ int main(int argc, char *argv[])
         std::cout <<  "Distancia minima encontrada en el texton " << c << " es: " << min << std::endl;
     }
 
-//    // Histogramas ???
-//    int hist[10];
-//    std::fill_n(hist, 10, 0);
+    // Calcular distancia minima para solo un filtro (no vector completo) con cada texton, y calcular
+    // la cantidad de textones que se agrupan a ese texton (antes del K-means). INCOMPLETO
+    //float min = 999;
+    //int x;
+    //for (int i = 0; i < fbank[0].TextonDictionary.rows; i++) {
+    //  float dist;
+    //  float d1 = fbank[0].TextonDictionary.at<float>(i,0);
+    //  float d2 = Tresponse.at<float>(0,0);
+    //  dist = cv::abs(d1 - d2);
+    //  if(dist < min) {
+    //      min = dist;
+    //      x = i;
+    //  }
+    //  cout << d1 << " - "<< d2 << " = " << dist << endl;
+    //}
+    //cout << min << "en: " << x << endl;
 
-//    //cout << "sdjkhjaks: " << roi.cols*roirows << endl;
+    // Histogramas ???
+    //int hist[10];
+    //std::fill_n(hist, 10, 0);
+    //for (int i = 0; i < bestLabels.rows; i++) {
+    //    hist[bestLabels.at<int>(i)]++;
+    //}
+    //for (int i = 0; i < 10; i++)
+    //    cout << "hay " << hist[i] <<  " " << i << "s" << endl;
 
-//    for (int i = 0; i < bestLabels.rows; i++) {
-//        hist[bestLabels.at<int>(i)]++;
-//    }
-
-//    for (int i = 0; i < 10; i++)
-//        cout << "hay " << hist[i] <<  " " << i << "s" << endl;
-
-    // show filters
-    /*
-    for(int i = 0; i < 38; i++) {
-        QString s = "Bank: Filter " + QString::number(i);
-        cv::Mat r;
-        cv::resize(FilterBank::filterToShow(fbank.filters[i]),r, cv::Size(2*bankSize, 2*bankSize));
-        cv::imshow(s.toStdString(), r);
-    }*/
-
-    /*
-    // Cargar imagen
-    if (argc == 1) {
-         std::cerr << "Error abriendo imagen" << std::endl;
-         return -1;
-    }
-    cv::Mat image = cv::imread(argv[1], 1);
-    if(image.empty()) {
-        std::cerr << "Error reading image " << argv[1] << std::endl;
-        return 1;
-    }
-    cv::imshow("imagen", image);
-
-    // Imprime puntos
-    std::cout << "Arreglo de puntos: ";
-    for (unsigned i = 0; i < imagePoints.size(); i++) {
-        cout << imagePoints[i] <<  " ";
-    }
-    */
-    cv::waitKey(0);
+    // Show filters
+    //for(int i = 0; i < 38; i++) {
+        //QString s = "Bank: Filter " + QString::number(i);
+        //cv::Mat r;
+        //cv::resize(FilterBank::filterToShow(fbank[0].filters[i]),r, cv::Size(2*bankSize, 2*bankSize));
+        //cv::imshow(s.toStdString(), r);
+    //}
+    //cv::waitKey(0);
     return 0;
 }
